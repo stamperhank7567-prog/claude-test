@@ -24,7 +24,7 @@
       <a href="#results">Results</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <a class="btn btn--small" href="#qualify" data-track="nav_cta">Check fit</a>
+    <a class="btn btn--small" href="#apply" data-track="nav_cta">Free call</a>
   </div>
 </header>
 
@@ -38,11 +38,11 @@
         <h1 class="load" style="--d:1">Your margin is leaking somewhere. <em>We find it in three weeks.</em></h1>
         <p class="lede load" style="--d:2">Halden &amp; Vale is a senior-only team of operators. We run a fixed-fee diagnostic on pricing, procurement and throughput, hand you a costed plan, then stay to deliver it in a 90-day Margin Sprint.</p>
         <div class="hero__ctas load" style="--d:3">
-          <a class="btn" href="#qualify" data-track="hero_cta">See if you qualify <span aria-hidden="true">→</span></a>
+          <a class="btn" href="#apply" data-track="hero_cta">Book a free discovery call <span aria-hidden="true">→</span></a>
           <a class="btn btn--ghost" href="#sprint">How the Sprint works</a>
         </div>
         <ul class="hero__proof load" style="--d:4">
-          <li><strong>2 min</strong> fit check</li>
+          <li><strong>Free</strong> discovery call</li>
           <li><strong>Fixed fee</strong> diagnostic</li>
           <li><strong>3×</strong> fee-back guarantee</li>
         </ul>
@@ -166,101 +166,28 @@
     </div>
   </section>
 
-  <!-- 6. CONVERSION: qualifier -> booking or nurture -->
-  <section class="section section--ink" id="qualify">
+  <!-- 6. CONVERSION: one action, an external application form -->
+  <section class="section section--ink" id="apply">
     <div class="wrap qualify">
       <div class="qualify__intro reveal">
-        <p class="eyebrow">Fit check · 4 questions</p>
-        <h2>See if a Sprint makes sense for you</h2>
-        <p>We take on six clients a quarter. Answer four questions and you'll know right away whether a diagnostic call is worth your time. If it isn't, we'll send you the self-assessment we use internally instead.</p>
+        <p class="eyebrow">Free discovery call · 30 minutes</p>
+        <h2>Find out where your margin is going</h2>
+        <p>We take on six clients a quarter. Apply for a free discovery call and a partner will tell you, on the call, whether a Sprint would pay for itself in your business. If it wouldn't, we'll say so.</p>
         <ul class="ticks">
           <li>No sales sequence. One email, from a partner.</li>
           <li>Your answers stay with us. NDA available before any data request.</li>
         </ul>
       </div>
 
-      <form class="quiz reveal" id="quiz" novalidate data-endpoint="">
-        <div class="quiz__progress" aria-hidden="true"><span id="quiz-bar"></span></div>
-        <p class="quiz__step mono" id="quiz-step" aria-live="polite">Question 1 of 4</p>
-
-        <fieldset class="q is-active" data-step="1">
-          <legend>What is your annual revenue?</legend>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="revenue" value="lt20" data-score="0" id="rev-lt20"><span>Under $20M</span></label>
-            <label class="opt"><input type="radio" name="revenue" value="20-100" data-score="3" id="rev-20"><span>$20M–$100M</span></label>
-            <label class="opt"><input type="radio" name="revenue" value="100-500" data-score="3" id="rev-100"><span>$100M–$500M</span></label>
-            <label class="opt"><input type="radio" name="revenue" value="gt500" data-score="1" id="rev-500"><span>Over $500M</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="q" data-step="2" hidden>
-          <legend>Where does it hurt most?</legend>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="pain" value="pricing" data-score="3" id="pain-pricing"><span>Pricing and discounting</span></label>
-            <label class="opt"><input type="radio" name="pain" value="procurement" data-score="3" id="pain-proc"><span>Supplier costs</span></label>
-            <label class="opt"><input type="radio" name="pain" value="throughput" data-score="3" id="pain-thru"><span>Throughput and labour</span></label>
-            <label class="opt"><input type="radio" name="pain" value="unsure" data-score="1" id="pain-unsure"><span>Not sure yet</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="q" data-step="3" hidden>
-          <legend>When do you need results?</legend>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="timing" value="now" data-score="3" id="time-now"><span>This quarter</span></label>
-            <label class="opt"><input type="radio" name="timing" value="next" data-score="2" id="time-next"><span>Within 6 months</span></label>
-            <label class="opt"><input type="radio" name="timing" value="later" data-score="0" id="time-later"><span>Just researching</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="q" data-step="4" hidden>
-          <legend>Where should we send your result?</legend>
-          <div class="fields">
-            <label class="field" for="f-name"><span>Full name</span><input id="f-name" name="name" type="text" autocomplete="name" required></label>
-            <label class="field" for="f-email"><span>Work email</span><input id="f-email" name="email" type="email" autocomplete="email" required></label>
-            <label class="field" for="f-company"><span>Company</span><input id="f-company" name="company" type="text" autocomplete="organization" required></label>
-            <label class="field" for="f-role"><span>Your role</span>
-              <select id="f-role" name="role" required>
-                <option value="">Choose one</option>
-                <option value="ceo" data-score="2">CEO / Owner</option>
-                <option value="cfo" data-score="2">CFO / Finance lead</option>
-                <option value="coo" data-score="2">COO / Operations lead</option>
-                <option value="other" data-score="0">Other</option>
-              </select>
-            </label>
-          </div>
-          <p class="quiz__error" id="quiz-error" role="alert" hidden></p>
-        </fieldset>
-
-        <div class="quiz__nav" id="quiz-nav">
-          <button type="button" class="btn btn--ghost btn--small" id="quiz-back" hidden>← Back</button>
-          <button type="button" class="btn" id="quiz-next" disabled>Next</button>
-        </div>
-
-        <!-- Result: qualified -->
-        <div class="result" id="result-yes" hidden tabindex="-1">
-          <p class="result__badge mono">Strong fit</p>
-          <h3>Pick a time for a 30-minute diagnostic call</h3>
-          <p>You'll speak with a partner, not a sales rep. Choose a slot and we'll confirm by email within one business day.</p>
-          <div class="slots" id="slots" role="radiogroup" aria-label="Available times"></div>
-          <button type="button" class="btn" id="book" disabled>Request this time</button>
-        </div>
-
-        <!-- Result: booked -->
-        <div class="result" id="result-booked" hidden tabindex="-1">
-          <p class="result__badge mono">Request received</p>
-          <h3>Thanks, <span data-fill="name">there</span>.</h3>
-          <p>We've noted <strong data-fill="slot"></strong>. A partner will confirm by email to <strong data-fill="email"></strong> within one business day, along with a short data request so the call is useful.</p>
-        </div>
-
-        <!-- Result: not yet a fit -->
-        <div class="result" id="result-nurture" hidden tabindex="-1">
-          <p class="result__badge result__badge--soft mono">Not quite yet</p>
-          <h3>A full Sprint probably isn't right for you today</h3>
-          <p>That's useful to know before anyone spends money. We'll email <strong data-fill="email"></strong> our Margin Self-Assessment: the 40-question checklist our partners use in week one, with benchmarks for your sector.</p>
-          <p class="muted">If your situation changes, retake the fit check any time.</p>
-          <button type="button" class="btn btn--ghost btn--small" id="restart">Start over</button>
-        </div>
-      </form>
+      <div class="apply reveal">
+        <ol class="apply__steps">
+          <li><span class="mono">Step 1</span><strong>Apply</strong> A short form about your company and where margin is slipping. Takes about 3 minutes.</li>
+          <li><span class="mono">Step 2</span><strong>Review</strong> A partner reads every application and replies by email to set a time.</li>
+          <li><span class="mono">Step 3</span><strong>Call</strong> 30 minutes on your numbers. You leave with the two or three levers worth chasing first.</li>
+        </ol>
+        <a class="btn btn--big" href="https://forms.gle/vpxuxUm5aRSqbAAn8" target="_blank" rel="noopener" data-track="apply_form">Apply for a free discovery call <span aria-hidden="true">→</span></a>
+        <p class="apply__note">Opens a Google Form in a new tab. No cost, no obligation.</p>
+      </div>
     </div>
   </section>
 
@@ -300,7 +227,7 @@
   <section class="closing">
     <div class="wrap closing__row reveal">
       <h2>Six Sprint slots a quarter. <em>Q1 2027 is filling now.</em></h2>
-      <a class="btn" href="#qualify" data-track="closing_cta">Check your fit <span aria-hidden="true">→</span></a>
+      <a class="btn" href="#apply" data-track="closing_cta">Apply for a free call <span aria-hidden="true">→</span></a>
     </div>
   </section>
 </main>
@@ -314,8 +241,8 @@
 </footer>
 
 <div class="dock" id="dock" aria-hidden="true">
-  <span>Free 2-minute fit check</span>
-  <a class="btn btn--small" href="#qualify" tabindex="-1">Start</a>
+  <span>Free discovery call</span>
+  <a class="btn btn--small" href="#apply" tabindex="-1">Apply</a>
 </div>
 
 <script src="assets/app.js"></script>

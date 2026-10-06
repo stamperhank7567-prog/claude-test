@@ -15,12 +15,12 @@
   /* ---------- Sticky nav border + mobile dock ---------- */
   const nav = $(".nav");
   const dock = $("#dock");
-  const qualify = $("#qualify");
-  let qualifyVisible = false;
+  const applySection = $("#apply");
+  let applyVisible = false;
   const onScroll = () => {
     const y = window.scrollY;
     nav.classList.toggle("is-scrolled", y > 8);
-    dock.classList.toggle("is-shown", y > window.innerHeight * 0.8 && !qualifyVisible);
+    dock.classList.toggle("is-shown", y > window.innerHeight * 0.8 && !applyVisible);
     updateTimeline();
   };
 
@@ -142,211 +142,14 @@
     timeline.style.setProperty("--progress", reduceMotion ? 1 : p.toFixed(3));
   }
 
-  /* ---------- Qualifier quiz ---------- */
-  const setupQuiz = () => {
-    const form = $("#quiz");
-    if (!form) return;
-    const steps = $$(".q", form);
-    const total = steps.length;
-    const bar = $("#quiz-bar"), stepLabel = $("#quiz-step");
-    const next = $("#quiz-next"), back = $("#quiz-back"), navRow = $("#quiz-nav");
-    const err = $("#quiz-error");
-    const results = { yes: $("#result-yes"), booked: $("#result-booked"), nurture: $("#result-nurture") };
-    const QUALIFY_AT = 8; // out of a possible 11
-    let current = 0;
-    let started = false;
-    let lead = {};
-
-    const answered = (i) => {
-      const fs = steps[i];
-      const radios = $$("input[type=radio]", fs);
-      return radios.length ? radios.some((r) => r.checked) : true;
-    };
-
-    const show = (i) => {
-      steps.forEach((fs, k) => {
-        fs.hidden = k !== i;
-        fs.classList.toggle("is-active", k === i);
-      });
-      current = i;
-      bar.style.width = `${((i + 1) / total) * 100}%`;
-      stepLabel.textContent = `Question ${i + 1} of ${total}`;
-      back.hidden = i === 0;
-      next.textContent = i === total - 1 ? "See my result" : "Next";
-      next.disabled = !answered(i);
-    };
-
-    form.addEventListener("change", (e) => {
-      if (!started) { started = true; track("quiz_start"); }
-      if (e.target.type === "radio") {
-        next.disabled = false;
-        track("quiz_answer", { step: current + 1, value: e.target.value });
-        // Auto-advance on single-choice questions for a faster funnel.
-        if (current < total - 1) setTimeout(() => show(current + 1), reduceMotion ? 0 : 260);
-      }
-    });
-
-    back.addEventListener("click", () => show(Math.max(0, current - 1)));
-
-    const validateContact = () => {
-      const fields = $$("input, select", steps[total - 1]);
-      let firstBad = null;
-      fields.forEach((f) => {
-        const ok = f.checkValidity() && f.value.trim() !== "";
-        f.setAttribute("aria-invalid", ok ? "false" : "true");
-        if (!ok && !firstBad) firstBad = f;
-      });
-      if (firstBad) {
-        err.textContent = firstBad.type === "email" && firstBad.value
-          ? "Enter a work email in the format name@company.com."
-          : "Fill in all four fields so we know who to reply to.";
-        err.hidden = false;
-        firstBad.focus();
-        return false;
-      }
-      err.hidden = true;
-      return true;
-    };
-
-    const score = () => {
-      let s = 0;
-      $$("input[type=radio]:checked", form).forEach((r) => (s += +r.dataset.score));
-      const role = $("#f-role");
-      s += +(role.selectedOptions[0]?.dataset.score || 0);
-      return s;
-    };
-
-    const fill = (root) => {
-      $$("[data-fill]", root).forEach((n) => { n.textContent = lead[n.dataset.fill] || n.textContent; });
-    };
-
-    const submitLead = async (payload) => {
-      const endpoint = form.dataset.endpoint;
-      try { localStorage.setItem("hv_lead", JSON.stringify(payload)); } catch (_) { /* storage blocked */ }
-      if (!endpoint) {
-        console.info("[Halden & Vale] No form endpoint configured. Lead payload:", payload);
-        return true;
-      }
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        return res.ok;
-      } catch (_) {
-        return false;
-      }
-    };
-
-    const showResult = (key) => {
-      steps.forEach((fs) => (fs.hidden = true));
-      navRow.hidden = true;
-      $(".quiz__progress", form).hidden = true;
-      stepLabel.hidden = true;
-      Object.values(results).forEach((r) => (r.hidden = true));
-      const r = results[key];
-      fill(r);
-      r.hidden = false;
-      r.focus({ preventScroll: true });
-    };
-
-    next.addEventListener("click", async () => {
-      if (current < total - 1) { if (answered(current)) show(current + 1); return; }
-      if (!validateContact()) return;
-      const data = Object.fromEntries(new FormData(form).entries());
-      const s = score();
-      lead = { ...data, score: s, qualified: s >= QUALIFY_AT };
-      next.disabled = true;
-      next.textContent = "Checking…";
-      const ok = await submitLead({ ...lead, stage: "qualified_check", at: new Date().toISOString() });
-      next.disabled = false;
-      if (!ok) {
-        next.textContent = "See my result";
-        err.textContent = "We couldn't send your answers. Check your connection and try again, or email hello@haldenvale.example.";
-        err.hidden = false;
-        return;
-      }
-      track("quiz_complete", { score: s, qualified: lead.qualified });
-      if (lead.qualified) { buildSlots(); showResult("yes"); } else { showResult("nurture"); }
-    });
-
-    // Keep Enter in text fields from submitting the whole form early.
-    form.addEventListener("submit", (e) => { e.preventDefault(); next.click(); });
-
-    /* Booking slots: next five business days, two times each, in the visitor's timezone. */
-    const slotsEl = $("#slots"), bookBtn = $("#book");
-    let chosen = null;
-    const buildSlots = () => {
-      slotsEl.innerHTML = "";
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      let days = 0;
-      while (days < 4) {
-        d.setDate(d.getDate() + 1);
-        if (d.getDay() === 0 || d.getDay() === 6) continue;
-        days++;
-        [10, 14].forEach((h) => {
-          const t = new Date(d);
-          t.setHours(h);
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "slot";
-          btn.setAttribute("role", "radio");
-          btn.setAttribute("aria-checked", "false");
-          const day = t.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
-          const time = t.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-          btn.innerHTML = `${day}<small>${time}</small>`;
-          btn.dataset.label = `${day}, ${time}`;
-          btn.dataset.iso = t.toISOString();
-          btn.addEventListener("click", () => {
-            $$(".slot", slotsEl).forEach((b) => b.setAttribute("aria-checked", "false"));
-            btn.setAttribute("aria-checked", "true");
-            chosen = btn;
-            bookBtn.disabled = false;
-          });
-          slotsEl.appendChild(btn);
-        });
-      }
-    };
-
-    bookBtn.addEventListener("click", async () => {
-      if (!chosen) return;
-      bookBtn.disabled = true;
-      bookBtn.textContent = "Sending…";
-      lead.slot = chosen.dataset.label;
-      const ok = await submitLead({ ...lead, stage: "call_requested", slot_iso: chosen.dataset.iso, at: new Date().toISOString() });
-      if (!ok) {
-        bookBtn.disabled = false;
-        bookBtn.textContent = "Try again";
-        return;
-      }
-      track("call_requested", { slot: chosen.dataset.iso });
-      showResult("booked");
-    });
-
-    $("#restart").addEventListener("click", () => {
-      form.reset();
-      Object.values(results).forEach((r) => (r.hidden = true));
-      navRow.hidden = false;
-      $(".quiz__progress", form).hidden = false;
-      stepLabel.hidden = false;
-      $$("[aria-invalid]", form).forEach((f) => f.removeAttribute("aria-invalid"));
-      show(0);
-    });
-
-    show(0);
-  };
-
-  /* ---------- Hide dock while the quiz is on screen ---------- */
-  if ("IntersectionObserver" in window && qualify) {
-    new IntersectionObserver(([e]) => { qualifyVisible = e.isIntersecting; onScroll(); }, { threshold: 0.15 }).observe(qualify);
+  /* ---------- Hide dock while the apply section is on screen ---------- */
+  if ("IntersectionObserver" in window && applySection) {
+    new IntersectionObserver(([e]) => { applyVisible = e.isIntersecting; onScroll(); }, { threshold: 0.15 }).observe(applySection);
   }
 
   drawBridge();
   setupReveals();
   setupCounters();
-  setupQuiz();
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", updateTimeline, { passive: true });

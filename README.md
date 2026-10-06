@@ -10,9 +10,9 @@ A static, dependency-free landing funnel for an operations and margin consulting
 | Self-identification | "Revenue is up. Margin isn't." | Let the visitor recognise their problem with concrete thresholds |
 | Offer | 90-day Margin Sprint + 3× guarantee | One product, a fixed sequence, risk reversal |
 | Proof | Stats + testimonials | Evidence, stated in basis points and ROI |
-| Conversion | 4-question fit check | Scores the lead, then routes to **booking** (qualified) or **nurture** (not yet) |
+| Conversion | "Apply for a free discovery call" | One button to the application form (Google Form, opens in a new tab) |
 | Objections | FAQ | Price, time, confidentiality |
-| Last call | Closing CTA + mobile dock | Scarcity and a persistent path back to the fit check |
+| Last call | Closing CTA + mobile dock | Scarcity and a persistent path back to the application |
 
 ## Before you launch
 
@@ -24,10 +24,8 @@ These are placeholders. Shipping them as-is would be misleading:
 
 ## Wiring it up
 
-- **Lead capture:** set `data-endpoint` on `<form id="quiz">` to a URL that accepts a JSON `POST` (Formspree, a Zapier/Make webhook, HubSpot via a serverless function). With no endpoint, the payload is logged to the console and saved to `localStorage` only.
-- **Booking:** the time-slot picker generates a *request*, not a confirmed meeting. If you use Calendly, Cal.com or HubSpot Meetings, replace `#result-yes` with a link to your scheduler, prefilled with name and email.
-- **Scoring:** each answer carries `data-score`; the threshold is `QUALIFY_AT` in `assets/app.js` (default 8 of 11). Tune it against real close rates.
-- **Analytics:** events (`cta_click`, `quiz_start`, `quiz_answer`, `quiz_complete`, `call_requested`) are pushed to `window.dataLayer`, ready for Google Tag Manager.
+- **Application form:** the main button in `#apply` links to `https://forms.gle/vpxuxUm5aRSqbAAn8`. Every other call to action (nav, hero, closing banner, mobile dock) scrolls to that section. To change the form, edit the `href` in `index.html`.
+- **Analytics:** click events (`cta_click` with an `id` such as `hero_cta` or `apply_form`) are pushed to `window.dataLayer`, ready for Google Tag Manager. The site can't see form completions; count those in Google Forms responses.
 
 ## Notes
 
